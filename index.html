@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sensor Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .sensor-data {
+      margin-top: 20px;
+    }
+    .sensor-data div {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP32 Sensor Data</h1>
+  <div class="sensor-data" id="sensorData">
+    <div>Temperature: <span id="temperature"></span> °C</div>
+    <div>Pressure: <span id="pressure"></span> hPa</div>
+    <div>Humidity: <span id="humidity"></span> %</div>
+    <div>MQ-135: <span id="ppmMQ135"></span> ppm</div>
+    <div>MQ-8: <span id="ppmMQ8"></span> ppm</div>
+    <div>MQ-3: <span id="ppmMQ3"></span> ppm</div>
+  </div>
+
+  <!-- Include Firebase libraries -->
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBmWH39asJnYP-F0U3LUg_nVvx857oifYw",
+      authDomain: "forest-fire-detectio.firebaseapp.com",
+      databaseURL: "https://forest-fire-detectio-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "forest-fire-detectio",
+      storageBucket: "forest-fire-detectio.appspot.com",
+      messagingSenderId: "925779167094",
+      appId: "1:925779167094:web:3c1e735b95c78559591c57"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Reference to the parent path
+    const sensorDataParentRef = database.ref('/sensors/ESP32_Sender');
+
+    // Function to update the webpage with sensor data
+    function updateSensorData(data) {
+      document.getElementById('temperature').textContent = data.temperature;
+      document.getElementById('pressure').textContent = data.pressure;
+      document.getElementById('humidity').textContent = data.humidity;
+      document.getElementById('ppmMQ135').textContent = data.ppmMQ135;
+      document.getElementById('ppmMQ8').textContent = data.ppmMQ8;
+      document.getElementById('ppmMQ3').textContent = data.ppmMQ3;
+    }
+
+    // Retrieve the latest sensor data from Firebase
+    sensorDataParentRef.on('child_added', (snapshot) => {
+      const data = snapshot.val();
+      updateSensorData(data);
+    });
+
+    // Also listen for changes in any child data
+    sensorDataParentRef.on('child_changed', (snapshot) => {
+      const data = snapshot.val();
+      updateSensorData(data);
+    });
+
+  </script>
+</body>
+</html>
